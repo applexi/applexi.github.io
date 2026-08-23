@@ -1,0 +1,42 @@
+---
+import type { CollectionEntry } from "astro:content";
+import FormattedDate from "./FormattedDate.astro";
+import TagRow from "./TagRow.astro";
+
+interface Props {
+  post: CollectionEntry<"writing">;
+  showDescription?: boolean;
+}
+
+const { post, showDescription = true } = Astro.props;
+---
+
+<article>
+  <a class="title" href={`/writing/${post.id}`}>{post.data.title}</a>
+  <FormattedDate date={post.data.pubDate} />
+  {showDescription && <p class="muted">{post.data.description}</p>}
+  <TagRow tags={post.data.tags} />
+</article>
+
+<style>
+  article {
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .title {
+    display: block;
+    font-weight: 550;
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .title:hover {
+    color: var(--accent);
+  }
+
+  p {
+    margin: 0.35rem 0 0.6rem;
+    font-size: 0.9375rem;
+  }
+</style>

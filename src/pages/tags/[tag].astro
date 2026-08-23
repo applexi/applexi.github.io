@@ -1,0 +1,66 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProjectCard from "../../components/ProjectCard.astro";
+import PostLink from "../../components/PostLink.astro";
+import { getTags } from "../../lib/tags";
+
+export async function getStaticPaths() {
+  const tags = await getTags();
+  return tags.map((tag) => ({
+    params: { tag: tag.slug },
+    props: { tag },
+  }));
+}
+
+const { tag } = Astro.props;
+const { label, blurb, projects, posts } = tag;
+---
+
+<BaseLayout
+  title={label}
+  description={blurb ?? `Projects and writing tagged ${label}.`}
+>
+  <a class="back" href="/tags">&larr; All tags</a>
+
+  <h1>{label}</h1>
+  {blurb && <p class="lead">{blurb}</p>}
+
+  {
+    projects.length > 0 && (
+      <section>
+        <h2>Projects</h2>
+        {projects.map((project) => (
+          <ProjectCard project={project} />
+        ))}
+      </section>
+    )
+  }
+
+  {
+    posts.length > 0 && (
+      <section>
+        <h2>Writing</h2>
+        {posts.map((post) => (
+          <PostLink post={post} />
+        ))}
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  section + section {
+    margin-top: 2.5rem;
+  }
+
+  h2 {
+    margin-bottom: 0.5rem;
+  }
+</style>

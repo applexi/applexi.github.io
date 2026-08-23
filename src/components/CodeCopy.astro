@@ -1,0 +1,56 @@
+---
+/**
+ * Adds a copy button to every code block on the page. The markup is built here rather
+ * than in the Markdown pipeline because the button is only useful with JavaScript
+ * anyway — without it, nothing is added and the code block is untouched.
+ */
+---
+
+<script>
+  const IDLE = "Copy code";
+  const DONE = "Copied";
+
+  const icons = `
+    <svg class="clipboard" viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="9" y="9" width="12" height="12" rx="2"></rect>
+      <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"></path>
+    </svg>
+    <svg class="check" viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M20 6L9 17l-5-5"></path>
+    </svg>`;
+
+  for (const pre of document.querySelectorAll("pre.astro-code")) {
+    const wrapper = document.createElement("div");
+    wrapper.className = "code-block";
+    pre.replaceWith(wrapper);
+    wrapper.append(pre);
+
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "code-copy";
+    button.title = IDLE;
+    button.setAttribute("aria-label", IDLE);
+    button.innerHTML = icons;
+    wrapper.append(button);
+
+    let reset: number | undefined;
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(pre.textContent ?? "");
+      } catch {
+        // Refused, so say nothing rather than claim a copy that didn't happen.
+        return;
+      }
+
+      button.dataset.copied = "";
+      button.title = DONE;
+      button.setAttribute("aria-label", DONE);
+      window.clearTimeout(reset);
+      reset = window.setTimeout(() => {
+        delete button.dataset.copied;
+        button.title = IDLE;
+        button.setAttribute("aria-label", IDLE);
+      }, 1600);
+    });
+  }
+</script>

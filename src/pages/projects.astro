@@ -1,0 +1,28 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getProjects } from "../lib/collections";
+import { site } from "../site.config";
+
+const projects = await getProjects();
+---
+
+<BaseLayout
+  title="Projects"
+  description={`Projects built by ${site.title}.`}
+>
+  <div class="page-heading">
+    <h1>Projects</h1>
+    <a class="tag-pill" href="/tags">All tags &rarr;</a>
+  </div>
+
+  {
+    projects.length === 0 ? (
+      <p class="muted">
+        No projects yet. Add a Markdown file to <code>src/content/projects/</code>.
+      </p>
+    ) : (
+      projects.map((project) => <ProjectCard project={project} />)
+    )
+  }
+</BaseLayout>

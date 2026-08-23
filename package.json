@@ -1,0 +1,31 @@
+{
+  "name": "applexi.github.io",
+  "type": "module",
+  "version": "0.0.1",
+  "engines": {
+    "node": ">=22.12.0"
+  },
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "astro": "astro"
+  },
+  "overrides": {
+    "satteri": "$satteri"
+  },
+  "dependencies": {
+    "@astrojs/markdown-satteri": "^0.3.7",
+    "@astrojs/rss": "^4.0.19",
+    "@astrojs/sitemap": "^3.7.3",
+    "astro": "^7.2.4",
+    "katex": "^0.18.4",
+    "satteri": "^0.10.5",
+    "satteri-katex": "^0.1.1"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "typescript": "^6.0.3"
+  }
+}

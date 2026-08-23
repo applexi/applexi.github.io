@@ -1,0 +1,73 @@
+---
+import type { CollectionEntry } from "astro:content";
+import TagRow from "./TagRow.astro";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+}
+
+const { project } = Astro.props;
+const { title, description, github, demo, paper, tags } = project.data;
+---
+
+<article>
+  <h3><a class="title" href={`/projects/${project.id}`}>{title}</a></h3>
+  <p class="muted">{description}</p>
+
+  <TagRow tags={tags} class="tag-row--spaced" />
+
+  {
+    (paper || github || demo) && (
+      <p class="links">
+        {paper && (
+          <a href={paper} rel="noopener">
+            Paper
+          </a>
+        )}
+        {github && (
+          <a href={github} rel="noopener">
+            Source
+          </a>
+        )}
+        {demo && (
+          <a href={demo} rel="noopener">
+            Live demo
+          </a>
+        )}
+      </p>
+    )
+  }
+</article>
+
+<style>
+  article {
+    padding: 1.25rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.0625rem;
+  }
+
+  .title {
+    color: var(--text);
+    text-decoration: none;
+  }
+
+  .title:hover {
+    color: var(--accent);
+  }
+
+  p {
+    margin: 0 0 0.65rem;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin: 0;
+    font-size: 0.9375rem;
+  }
+</style>

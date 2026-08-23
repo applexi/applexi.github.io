@@ -1,0 +1,29 @@
+---
+import { isImportant, sortTags, tagUrl } from "../lib/tags";
+
+interface Props {
+  tags: string[];
+  /** Extra classes for the list, e.g. `tag-row--spaced`. */
+  class?: string;
+}
+
+const { tags, class: className } = Astro.props;
+const sorted = sortTags(tags);
+---
+
+{
+  sorted.length > 0 && (
+    <ul class:list={["tag-row", className]}>
+      {sorted.map((tag) => (
+        <li>
+          <a
+            class:list={["tag", isImportant(tag) && "tag--important"]}
+            href={tagUrl(tag)}
+          >
+            {tag}
+          </a>
+        </li>
+      ))}
+    </ul>
+  )
+}

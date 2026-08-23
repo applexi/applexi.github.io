@@ -1,0 +1,478 @@
+/*
+  Change the look of the whole site from the variables below.
+  Colors are defined twice: once for light mode, once for dark.
+*/
+
+:root {
+  --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto,
+    "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas,
+    "Liberation Mono", monospace;
+
+  --content-width: 48rem;
+  --radius: 0.5rem;
+
+  --bg: #fdfdfc;
+  /*
+    Highlights and code are the same neutral, with the highlight a step lighter, so the
+    two never read as the same surface. Each mode keeps a few points of lightness
+    between the page and both tints.
+  */
+  --bg-subtle: #ededea;
+  --bg-highlight: #f7f7f4;
+  --text: #1a1a18;
+  --text-muted: #6b6b66;
+  --border: #e2e2de;
+  /*
+    The pink the code themes use for keywords. Dark mode takes it as-is; light mode
+    darkens the same hue, since the original sits at 1.8:1 on a light page and links
+    run at body size.
+  */
+  --accent: #bd3597;
+  --accent-hover: #a52a82;
+  /* The highlighter theme's own text color, so inline code matches a plain block. */
+  --code-text: #4c4f69;
+}
+
+:root[data-theme="dark"] {
+  --bg: #131315;
+  --bg-subtle: #1c1c1f;
+  --bg-highlight: #26262b;
+  --text: #ececee;
+  --text-muted: #9a9aa2;
+  --border: #2c2c31;
+  --accent: #ffa1df;
+  --accent-hover: #ffc2ec;
+  --code-text: #f8f8f2;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-text-size-adjust: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.wrapper {
+  width: 100%;
+  max-width: var(--content-width);
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+main {
+  flex: 1;
+  padding: 3rem 0 5rem;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  line-height: 1.25;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.75rem;
+  font-weight: 650;
+}
+
+h1 {
+  font-size: 2rem;
+}
+h2 {
+  font-size: 1.375rem;
+  margin-top: 2.5rem;
+}
+h3 {
+  font-size: 1.1875rem;
+  margin-top: 1.75rem;
+}
+h4 {
+  font-size: 1.0625rem;
+  margin-top: 1.5rem;
+}
+
+/* Kept below heading weight so bold text never outranks the heading above it. */
+strong {
+  font-weight: 600;
+}
+
+p {
+  margin: 0 0 1.25rem;
+}
+
+/* Links carry their own color, so they don't need a rule under them as well. */
+a {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+a:hover {
+  color: var(--accent-hover);
+}
+
+hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 3rem 0;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+}
+
+code {
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  background: var(--bg-subtle);
+  padding: 0.15em 0.4em;
+  border-radius: 0.25rem;
+}
+
+/* Blocks get their colors from the highlighter; this is for the inline kind. */
+:not(pre) > code {
+  color: var(--code-text);
+}
+
+pre {
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  overflow-x: auto;
+  line-height: 1.6;
+}
+
+pre code {
+  background: none;
+  padding: 0;
+  font-size: 0.875rem;
+}
+
+/*
+  Shiki writes both themes into the markup: the light colors inline, the dark ones
+  as custom properties. Dark mode switches the tokens over to those properties.
+  The inline colors need !important to override. The block keeps the site's own
+  surface color in both themes so it doesn't drift from the palette above.
+*/
+.astro-code {
+  background-color: var(--bg-subtle) !important;
+}
+
+/* Copy button, wrapped around each code block by CodeCopy.astro. */
+.code-block {
+  position: relative;
+}
+
+/* Room for the button, so a wrapped line never runs under it. */
+.code-block pre {
+  padding-right: 3.25rem;
+}
+
+.code-copy {
+  position: absolute;
+  top: 0.4rem;
+  right: 0.4rem;
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: none;
+  border: 1px solid transparent;
+  border-radius: var(--radius);
+  color: var(--text-muted);
+  cursor: pointer;
+}
+
+/* The page background, since the block itself is already the subtle one. */
+.code-copy:hover {
+  color: var(--text);
+  background: var(--bg);
+  border-color: var(--border);
+}
+
+.code-copy svg {
+  width: 1.05rem;
+  height: 1.05rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.code-copy[data-copied] {
+  color: var(--accent);
+}
+
+.code-copy .check,
+.code-copy[data-copied] .clipboard {
+  display: none;
+}
+
+.code-copy[data-copied] .check {
+  display: block;
+}
+
+:root[data-theme="dark"] .astro-code,
+:root[data-theme="dark"] .astro-code span {
+  color: var(--shiki-dark) !important;
+  font-style: var(--shiki-dark-font-style) !important;
+  font-weight: var(--shiki-dark-font-weight) !important;
+  text-decoration: var(--shiki-dark-text-decoration) !important;
+}
+
+blockquote {
+  margin: 1.5rem 0;
+  padding-left: 1.25rem;
+  border-left: 2px solid var(--border);
+  color: var(--text-muted);
+}
+
+/* Shared utilities */
+
+.muted {
+  color: var(--text-muted);
+}
+
+.lead {
+  font-size: 1.1875rem;
+  color: var(--text-muted);
+}
+
+.tag-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-row--spaced {
+  margin-bottom: 0.65rem;
+}
+
+.tag {
+  display: inline-block;
+  font-size: 0.75rem;
+  font-family: var(--font-mono);
+  color: var(--text-muted);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  padding: 0.1rem 0.55rem;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+a.tag:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+/* Tags that say what kind of thing this is, listed in site.config. */
+.tag--important {
+  color: var(--text);
+  border-color: var(--text-muted);
+}
+
+/* Larger tag links, used for browsing rather than labelling. */
+.tag-pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tag-pill {
+  display: inline-block;
+  padding: 0.25rem 0.7rem;
+  font-size: 0.875rem;
+  color: var(--text);
+  background: var(--bg-subtle);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.tag-pill:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.tag-pill span {
+  font-family: var(--font-mono);
+  font-size: 0.6875rem;
+}
+
+/* A page title with a link sitting opposite it, sharing the same baseline. */
+.page-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  margin-bottom: 2rem;
+}
+
+.page-heading :is(h1, h2) {
+  margin: 0;
+}
+
+/* Long-form article body, used by writing and project pages */
+
+.prose :is(h2, h3) {
+  margin-top: 2.25rem;
+}
+
+.prose h4 {
+  margin-top: 1.75rem;
+}
+
+.prose ul,
+.prose ol {
+  padding-left: 1.25rem;
+  margin: 0 0 1.25rem;
+}
+
+.prose li {
+  margin-bottom: 0.4rem;
+}
+
+/* Diagrams are light-background images, so they keep a light surface in dark mode. */
+.prose img {
+  display: block;
+  margin: 2rem auto 0.75rem;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/*
+  The filter dims the whole element, white surface included, so a light diagram
+  doesn't glow against the dark page. Kept mild to keep labels inside legible.
+*/
+:root[data-theme="dark"] .prose img {
+  filter: brightness(0.88) contrast(1.04);
+}
+
+/* An italic line right after a diagram reads as its caption. */
+.prose p:has(img) + p em {
+  display: block;
+  font-style: normal;
+  font-size: 0.875rem;
+  color: var(--text-muted);
+}
+
+/*
+  A passage set apart by nothing but a tinted surface, written as <highlight> in
+  Markdown. Unknown elements are inline by default, so it needs display: block.
+*/
+highlight {
+  display: block;
+  margin: 1.5rem 0;
+  padding: 1rem 1.25rem;
+  background: var(--bg-highlight);
+  border-radius: var(--radius);
+}
+
+/*
+  Highlighting a bullet: the tint reaches left by the list's own 1.25rem of padding,
+  which is where the marker is drawn, and the matching left padding keeps the text
+  where it was. The marker is inline content of the item, so it paints over the tint
+  rather than behind it.
+*/
+li highlight {
+  margin: 0.3rem 0 0.3rem -1.25rem;
+  padding: 0.35rem 0.75rem 0.35rem 1.25rem;
+}
+
+highlight > :first-child {
+  margin-top: 0;
+}
+
+highlight > :last-child {
+  margin-bottom: 0;
+}
+
+/* Collapsible asides, written as <details> in Markdown. */
+.prose details {
+  margin: 1.5rem 0;
+  padding: 0.75rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+.prose summary {
+  cursor: pointer;
+  font-weight: 550;
+  color: var(--text);
+}
+
+.prose summary:hover {
+  color: var(--accent);
+}
+
+.prose summary::marker {
+  color: var(--text-muted);
+}
+
+.prose details[open] summary {
+  margin-bottom: 0.9rem;
+}
+
+.prose details > :last-child {
+  margin-bottom: 0;
+}
+
+.prose table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1.5rem 0;
+  font-size: 0.9375rem;
+}
+
+.prose :is(th, td) {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid var(--border);
+}
+
+/* The same surface as code, so a header row reads as a label rather than data. */
+.prose th {
+  background: var(--bg-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

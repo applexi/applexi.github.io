@@ -1,0 +1,25 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostLink from "../../components/PostLink.astro";
+import { getPosts } from "../../lib/collections";
+import { site } from "../../site.config";
+
+const posts = await getPosts();
+---
+
+<BaseLayout title="Writing" description={`Writing by ${site.title}.`}>
+  <div class="page-heading">
+    <h1>Writing</h1>
+    <a class="tag-pill" href="/tags">All tags &rarr;</a>
+  </div>
+
+  {
+    posts.length === 0 ? (
+      <p class="muted">
+        No posts yet. Add a Markdown file to <code>src/content/writing/</code>.
+      </p>
+    ) : (
+      posts.map((post) => <PostLink post={post} />)
+    )
+  }
+</BaseLayout>

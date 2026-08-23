@@ -1,0 +1,51 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { intro, site, socials } from "../site.config";
+---
+
+<BaseLayout>
+  <section class="hero">
+    {site.avatar && <img class="avatar" src={site.avatar} alt="" width="72" height="72" />}
+    <div>
+      <h1>{site.title}</h1>
+      <p class="lead">{site.tagline}</p>
+    </div>
+  </section>
+
+  {intro.map((paragraph) => <p>{paragraph}</p>)}
+
+  <p class="socials">
+    {socials.map((link) => <a href={link.href} rel="me noopener">{link.label}</a>)}
+  </p>
+</BaseLayout>
+
+<style>
+  .hero {
+    display: flex;
+    align-items: center;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+
+  .hero h1 {
+    margin-bottom: 0.25rem;
+  }
+
+  .hero .lead {
+    margin: 0;
+  }
+
+  .avatar {
+    border-radius: 999px;
+    flex-shrink: 0;
+    object-fit: cover;
+  }
+
+  .socials {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 2rem;
+    font-size: 0.9375rem;
+  }
+</style>

@@ -1,0 +1,68 @@
+---
+import { render } from "astro:content";
+import "katex/dist/katex.min.css";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import TagRow from "../../components/TagRow.astro";
+import { getProjects } from "../../lib/collections";
+
+export async function getStaticPaths() {
+  const projects = await getProjects();
+  return projects.map((project) => ({
+    params: { id: project.id },
+    props: { project },
+  }));
+}
+
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, description, github, demo, paper, tags } = project.data;
+---
+
+<BaseLayout title={title} description={description}>
+  <a class="back" href="/projects">&larr; Projects</a>
+
+  <h1>{title}</h1>
+  <p class="lead">{description}</p>
+
+  <TagRow tags={tags} />
+
+  {
+    (paper || github || demo) && (
+      <p class="links">
+        {paper && <a href={paper} rel="noopener">Paper</a>}
+        {github && <a href={github} rel="noopener">View source</a>}
+        {demo && <a href={demo} rel="noopener">Live demo</a>}
+      </p>
+    )
+  }
+
+  <hr />
+
+  <div class="prose">
+    <Content />
+  </div>
+
+  <CodeCopy />
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.25rem;
+    margin-top: 1rem;
+    font-size: 0.9375rem;
+  }
+
+  hr {
+    margin: 2rem 0;
+  }
+</style>

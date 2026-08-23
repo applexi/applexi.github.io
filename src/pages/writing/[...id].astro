@@ -1,0 +1,67 @@
+---
+import { render } from "astro:content";
+// Styles the math that remark-math/rehype-katex render at build time.
+import "katex/dist/katex.min.css";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CodeCopy from "../../components/CodeCopy.astro";
+import FormattedDate from "../../components/FormattedDate.astro";
+import TagRow from "../../components/TagRow.astro";
+import { getPosts } from "../../lib/collections";
+
+export async function getStaticPaths() {
+  const posts = await getPosts();
+  return posts.map((post) => ({
+    params: { id: post.id },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content } = await render(post);
+const { title, description, pubDate, updatedDate, tags } = post.data;
+---
+
+<BaseLayout title={title} description={description}>
+  <a class="back" href="/writing">&larr; Writing</a>
+
+  <article>
+    <header>
+      <h1>{title}</h1>
+      <p class="meta">
+        <FormattedDate date={pubDate} />
+        {updatedDate && <span class="muted">· updated <FormattedDate date={updatedDate} /></span>}
+      </p>
+      <TagRow tags={tags} />
+    </header>
+
+    <div class="prose">
+      <Content />
+    </div>
+  </article>
+
+  <CodeCopy />
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+
+  header {
+    padding-bottom: 1.5rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.4rem;
+    margin: 0 0 0.75rem;
+    font-size: 0.8125rem;
+  }
+</style>

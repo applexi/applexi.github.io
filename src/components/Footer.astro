@@ -1,0 +1,56 @@
+---
+import { socials, site } from "../site.config";
+
+const year = new Date().getFullYear();
+---
+
+<footer>
+  <div class="wrapper bar">
+    <p class="muted">&copy; {year} {site.title}</p>
+    <nav aria-label="Elsewhere">
+      {
+        socials.map((link) => (
+          <a href={link.href} rel="me noopener">
+            {link.label}
+          </a>
+        ))
+      }
+      <a href="/rss.xml">RSS</a>
+    </nav>
+  </div>
+</footer>
+
+<style>
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 1.5rem 0;
+    font-size: 0.875rem;
+  }
+
+  .bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  p {
+    margin: 0;
+  }
+
+  nav {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
+
+  nav a {
+    color: var(--text-muted);
+    text-decoration: none;
+  }
+
+  nav a:hover {
+    color: var(--text);
+  }
+</style>
