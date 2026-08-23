@@ -298,9 +298,7 @@ digest = "SHA384"
   sign off on an operation it completed (essentially used for additional trust)
   </toggle>
 
-<highlight>
-
-- Note that the `pcrs` map in the attestation are **locked PCRs** rather than all PCRs.
+- <highlight> Note that the `pcrs` map in the attestation are **locked PCRs** rather than all PCRs.
   Additionally, besides the six PCRs described earlier, there are 32 total indices.
   - PCRs can only be described (get lock status), locked, or extended. Thus, all locked
     PCRs stay locked and cannot be re-locked or changed during the enclave's lifetime
