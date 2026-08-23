@@ -24,13 +24,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site ?? site.url);
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link
-      rel="alternate"
-      type="application/rss+xml"
-      title={site.title}
-      href="/rss.xml"
-    />
-
     <meta property="og:type" content="website" />
     <meta property="og:title" content={pageTitle} />
     <meta property="og:description" content={description} />

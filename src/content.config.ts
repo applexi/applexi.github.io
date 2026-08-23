@@ -71,11 +71,17 @@ const writing = defineCollection({
       series: z.string().optional(),
       // Only needed when the reading order isn't the order they were published in.
       part: z.number().optional(),
+      // Set only on a series' part-0 contents page to offer subscriptions for that series.
+      subscribe: z.boolean().default(false),
       draft: z.boolean().default(false),
     })
     .refine((data) => data.part === undefined || data.series !== undefined, {
       message: "part needs a series to be a part of",
       path: ["part"],
+    })
+    .refine((data) => !data.subscribe || data.part === 0, {
+      message: "subscribe can only be set on a series' part-0 contents page",
+      path: ["subscribe"],
     }),
 });
 

@@ -24,6 +24,8 @@ export interface Series {
   name: string;
   /** The `part: 0` post, which lists the series and introduces it. */
   contents: CollectionEntry<"writing">;
+  /** Controlled by the contents page's `subscribe: true` frontmatter. */
+  subscribe: boolean;
   /** The instalments in reading order, the contents post not among them. */
   parts: CollectionEntry<"writing">[];
   /** 0 on the contents post, otherwise which instalment this is, counting from one. */
@@ -105,6 +107,7 @@ export async function getSeries(
   return {
     name,
     contents,
+    subscribe: contents.data.subscribe,
     parts,
     part,
     // The contents post is nobody's previous, so the first instalment has none, and the

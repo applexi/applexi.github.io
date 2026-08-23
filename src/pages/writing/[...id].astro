@@ -7,6 +7,7 @@ import CodeCopy from "../../components/CodeCopy.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
 import SeriesBox from "../../components/SeriesBox.astro";
 import SeriesNav from "../../components/SeriesNav.astro";
+import SeriesSubscribe from "../../components/SeriesSubscribe.astro";
 import TagRow from "../../components/TagRow.astro";
 import { getPosts, getSeries } from "../../lib/collections";
 
@@ -40,7 +41,10 @@ const series = await getSeries(post);
 
   <article>
     <header>
-      <h1>{title}</h1>
+      <div class="title-row">
+        <h1>{title}</h1>
+        {series?.subscribe && <SeriesSubscribe series={series} />}
+      </div>
       <p class="meta">
         <FormattedDate date={pubDate} />
         {updatedDate && <span class="muted">· updated <FormattedDate date={updatedDate} /></span>}
@@ -69,9 +73,24 @@ const series = await getSeries(post);
   }
 
   header {
+    position: relative;
     padding-bottom: 1.5rem;
     margin-bottom: 2rem;
     border-bottom: 1px solid var(--border);
+  }
+
+  .title-row {
+    padding-right: 3rem;
+  }
+
+  .title-row h1 {
+    margin-bottom: 0.75rem;
+  }
+
+  .title-row :global(.subscribe) {
+    position: absolute;
+    top: -0.1rem;
+    right: 0;
   }
 
   .meta {

@@ -1,0 +1,56 @@
+---
+import type { Series } from "../lib/collections";
+
+interface Props {
+  series: Series;
+}
+
+const { series } = Astro.props;
+---
+
+<a
+  class="subscribe"
+  href={`/writing/series/${series.contents.id}.xml`}
+  title={`Subscribe to ${series.name}`}
+  aria-label={`Subscribe to ${series.name}`}
+  type="application/rss+xml"
+>
+  <svg viewBox="0 0 24 24" aria-hidden="true">
+    <path d="M10.268 21a2 2 0 0 0 3.464 0" />
+    <path d="M3.262 15.326A1 1 0 0 0 4 17h16a1 1 0 0 0 .74-1.673C19.41 13.956 18 12.499 18 8A6 6 0 0 0 6 8c0 4.499-1.411 5.956-2.738 7.326" />
+  </svg>
+</a>
+
+<style>
+  .subscribe {
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    width: 2rem;
+    height: 2rem;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    border-radius: var(--radius);
+  }
+
+  .subscribe:hover {
+    color: var(--text);
+    background: var(--bg-subtle);
+    border-color: var(--border);
+  }
+
+  .subscribe:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+
+  svg {
+    width: 1.05rem;
+    height: 1.05rem;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.7;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+</style>

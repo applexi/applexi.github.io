@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
+import SeriesSubscribe from "./SeriesSubscribe.astro";
 import TagRow from "./TagRow.astro";
 import { getSeries } from "../lib/collections";
 
@@ -19,14 +20,15 @@ const {
   date,
   showSeries = true,
 } = Astro.props;
-const series = showSeries ? await getSeries(post) : undefined;
+const series = await getSeries(post);
 ---
 
 <article>
   <div class="heading">
-    <a class="title" href={`/writing/${post.id}`}>{post.data.title}</a>
-    {
-      series && (
+    <div class="heading-text">
+      <a class="title" href={`/writing/${post.id}`}>{post.data.title}</a>
+      {
+        showSeries && series && (
         <span class="series">
           {/* The name opens the contents post, which has no need to link to itself. */}
           {series.part > 0 ? (
@@ -38,8 +40,10 @@ const series = showSeries ? await getSeries(post) : undefined;
             ? ` \u00b7 ${series.part} of ${series.parts.length}`
             : " \u00b7 contents"}
         </span>
-      )
-    }
+        )
+      }
+    </div>
+    {series?.subscribe && <SeriesSubscribe series={series} />}
   </div>
   <FormattedDate date={date ?? post.data.pubDate} />
   {showDescription && <p class="muted">{post.data.description}</p>}
@@ -48,16 +52,27 @@ const series = showSeries ? await getSeries(post) : undefined;
 
 <style>
   article {
+    position: relative;
     padding: 1rem 0;
     border-bottom: 1px solid var(--border);
   }
 
   /* Wraps to its own line on narrow screens rather than squeezing the title. */
   .heading {
+    padding-right: 2.5rem;
+  }
+
+  .heading-text {
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
     gap: 0.1rem 0.5rem;
+  }
+
+  .heading :global(.subscribe) {
+    position: absolute;
+    top: 0.75rem;
+    right: 0;
   }
 
   .title {
