@@ -1,0 +1,39 @@
+---
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import PostLink from "../../components/PostLink.astro";
+import { getAllSeries } from "../../lib/collections";
+import { site } from "../../site.config";
+
+const series = await getAllSeries();
+---
+
+<BaseLayout title="Series" description={`Writing by ${site.title} in reading order.`}>
+  <a class="back" href="/writing">&larr; Writing</a>
+
+  <div class="page-heading">
+    <h1>Series</h1>
+  </div>
+
+  {
+    series.length === 0 ? (
+      <p class="muted">
+        No series yet. Give two posts the same <code>series</code> name, and one of them{" "}
+        <code>part: 0</code>.
+      </p>
+    ) : (
+      /* The row stands for the whole series, so it carries the newest date in it. */
+      series.map(({ contents, updated }) => (
+        <PostLink post={contents} date={updated} showSeries={false} />
+      ))
+    )
+  }
+</BaseLayout>
+
+<style>
+  .back {
+    display: inline-block;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
+    text-decoration: none;
+  }
+</style>

@@ -5,11 +5,24 @@ import "katex/dist/katex.min.css";
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import CodeCopy from "../../components/CodeCopy.astro";
 import FormattedDate from "../../components/FormattedDate.astro";
+import SeriesBox from "../../components/SeriesBox.astro";
+import SeriesNav from "../../components/SeriesNav.astro";
 import TagRow from "../../components/TagRow.astro";
-import { getPosts } from "../../lib/collections";
+import { getPosts, getSeries } from "../../lib/collections";
 
 export async function getStaticPaths() {
   const posts = await getPosts();
+
+  // /writing/series is the index of every series, and a static route quietly outranks
+  // this one, so a post of that name would never be reachable.
+  const clash = posts.find((post) => post.id === "series");
+  if (clash) {
+    throw new Error(
+      `"${clash.filePath}" would be published at /writing/series, which belongs to the ` +
+        `series index. Rename the file.`,
+    );
+  }
+
   return posts.map((post) => ({
     params: { id: post.id },
     props: { post },
@@ -19,6 +32,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content } = await render(post);
 const { title, description, pubDate, updatedDate, tags } = post.data;
+const series = await getSeries(post);
 ---
 
 <BaseLayout title={title} description={description}>
@@ -37,6 +51,10 @@ const { title, description, pubDate, updatedDate, tags } = post.data;
     <div class="prose">
       <Content />
     </div>
+
+    {series?.part === 0 && <SeriesBox series={series} />}
+
+    {series && series.part > 0 && <SeriesNav series={series} />}
   </article>
 
   <CodeCopy />

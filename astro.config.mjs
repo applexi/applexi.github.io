@@ -31,9 +31,11 @@ const katex = /** @type {import("satteri").MdastPluginDefinition} */ (
 );
 
 /**
- * `<toggle>` and `<title>` are renamed to `<details>` and `<summary>` before the HTML
- * is written, so posts get the browser's own fold behaviour — keyboard support,
- * find-in-page, no JavaScript — without naming those elements while writing.
+ * `<toggle>` and `<title>` are renamed to `<details>` and `<summary>`, while
+ * `<highlight>` becomes a block `<div>`, before the HTML is written. That gives posts
+ * the browser's own fold behaviour — keyboard support, find-in-page, no JavaScript —
+ * and lets highlights safely contain lists and toggles without naming those elements
+ * while writing.
  * Only raw HTML is touched, so `<title>` inside backticks stays as written.
  *
  * @type {import("satteri").MdastPluginDefinition}
@@ -43,7 +45,9 @@ const toggleSyntax = {
   html(node, ctx) {
     const renamed = node.value
       .replace(/<(\/?)toggle(?=[\s>])/g, "<$1details")
-      .replace(/<(\/?)title(?=[\s>])/g, "<$1summary");
+      .replace(/<(\/?)title(?=[\s>])/g, "<$1summary")
+      .replace(/<highlight(?=[\s>])/g, '<div class="highlight"')
+      .replace(/<\/highlight(?=[\s>])/g, "</div");
     if (renamed !== node.value) ctx.setProperty(node, "value", renamed);
   },
 };

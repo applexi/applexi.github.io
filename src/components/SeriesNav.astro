@@ -1,0 +1,117 @@
+---
+import type { Series } from "../lib/collections";
+
+interface Props {
+  series: Series;
+}
+
+const { series } = Astro.props;
+const { prev, next, part, contents } = series;
+// Every instalment leads back to the contents post. That post has no navigation of its
+// own, since it's the one thing that lists the series in full.
+const start = part > 0 ? contents : undefined;
+---
+
+{
+  (prev || next || start) && (
+    <nav class="series-nav" aria-label={`More of ${series.name}`}>
+      <div class="side">
+        {prev && (
+          <a href={`/writing/${prev.id}`}>
+            <span class="label">&larr; Previous</span>
+            <span class="title">{prev.data.title}</span>
+          </a>
+        )}
+      </div>
+
+      {start && (
+        <a class="start" href={`/writing/${start.id}`}>
+          <span class="label">{start.data.title}</span>
+        </a>
+      )}
+
+      <div class="side end">
+        {next && (
+          <a href={`/writing/${next.id}`}>
+            <span class="label">Next &rarr;</span>
+            <span class="title">{next.data.title}</span>
+          </a>
+        )}
+      </div>
+    </nav>
+  )
+}
+
+<style>
+  /*
+    Equal side columns put the middle one on the page's centre line rather than in
+    whatever space the two ends leave over. The ends sit on the bottom of the row so
+    their titles share a line, and the middle sits on top, level with their labels.
+  */
+  .series-nav {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+    align-items: end;
+    gap: 1rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  /* Named columns, since auto-placement would slide `next` left when there's no middle. */
+  .side {
+    display: flex;
+    grid-column: 1;
+  }
+
+  .start {
+    grid-column: 2;
+    align-self: start;
+  }
+
+  .side.end {
+    grid-column: 3;
+    justify-content: flex-end;
+    text-align: right;
+  }
+
+  a {
+    display: flex;
+    flex-direction: column;
+    gap: 0.15rem;
+  }
+
+  .label {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .title {
+    font-size: 0.9375rem;
+    color: var(--text);
+  }
+
+  a:hover .label,
+  a:hover .title {
+    color: var(--accent);
+  }
+
+  @media (max-width: 30rem) {
+    .series-nav {
+      grid-template-columns: minmax(0, 1fr);
+      justify-items: start;
+    }
+
+    .side,
+    .start,
+    .side.end {
+      grid-column: 1;
+    }
+
+    .side.end {
+      justify-content: flex-start;
+      text-align: left;
+    }
+  }
+</style>

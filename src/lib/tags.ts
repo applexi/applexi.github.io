@@ -3,14 +3,13 @@ import { importantTags } from "../site.config";
 import { getPosts, getProjects } from "./collections";
 
 export interface Tag {
-  /** URL-safe form used in /tags/<slug>. */
+  /** URL-safe form, used as the `tag` parameter on /search. */
   slug: string;
   /** The tag as written in frontmatter, shown to readers. */
   label: string;
   /** True for the tags listed in site.config, which sort first everywhere. */
   important: boolean;
-  /** Only important tags carry these: a blurb for the tag's page, and a name for prose. */
-  blurb?: string;
+  /** Only important tags carry this: a shorter name for use in prose. */
   short?: string;
   projects: CollectionEntry<"projects">[];
   posts: CollectionEntry<"writing">[];
@@ -27,8 +26,9 @@ export function tagSlug(tag: string) {
     .replace(/^-|-$/g, "");
 }
 
+/** Tags have no pages of their own: a chip opens /search with that tag already on. */
 export function tagUrl(tag: string) {
-  return `/tags/${tagSlug(tag)}`;
+  return `/search?tag=${tagSlug(tag)}`;
 }
 
 const important = new Map(
@@ -49,7 +49,7 @@ export function sortTags(tags: string[]) {
   return [...tags].sort((a, b) => rank(a) - rank(b));
 }
 
-/** How many things carry a tag, used for sorting and for the counts on /tags. */
+/** How many things carry a tag, used for sorting and for the counts on the pills. */
 export function tagCount(tag: Tag) {
   return tag.projects.length + tag.posts.length;
 }
@@ -77,7 +77,6 @@ export async function getTags(): Promise<Tag[]> {
           // Important tags read as configured; others take their first spelling.
           label: known?.label ?? label,
           important: Boolean(known),
-          blurb: known?.blurb,
           short: known?.short,
           projects: [],
           posts: [],
@@ -101,16 +100,11 @@ export async function getTags(): Promise<Tag[]> {
   );
 }
 
-/** The two groups shown on /tags. */
+/** The two groups of filter pills shown on /search. */
 export async function getTagGroups() {
   const tags = await getTags();
   return {
     important: tags.filter((tag) => tag.important),
     normal: tags.filter((tag) => !tag.important),
   };
-}
-
-export async function getTag(slug: string) {
-  const tags = await getTags();
-  return tags.find((tag) => tag.slug === slug);
 }

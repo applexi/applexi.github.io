@@ -1,0 +1,322 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import PostLink from "../components/PostLink.astro";
+import ProjectCard from "../components/ProjectCard.astro";
+import { getPosts, getProjects } from "../lib/collections";
+import { getTagGroups, tagCount, tagSlug } from "../lib/tags";
+import { site } from "../site.config";
+
+const [projects, posts] = await Promise.all([getProjects(), getPosts()]);
+const { important, normal } = await getTagGroups();
+
+const groups = [
+  { heading: "Kinds of thing", tags: important },
+  { heading: "Topics", tags: normal },
+].filter((group) => group.tags.length > 0);
+
+const slugs = (tags: string[]) => tags.map(tagSlug).filter(Boolean).join(" ");
+---
+
+<BaseLayout
+  title="Search"
+  description={`Search the projects and writing of ${site.title}.`}
+>
+  <div class="page-heading">
+    <h1>Search</h1>
+  </div>
+
+  <form role="search" data-form>
+    <input
+      type="search"
+      id="query"
+      name="q"
+      placeholder="A word, a title, anything, then maybe something"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Search projects and writing"
+    />
+  </form>
+
+  <details class="filters" data-filters>
+    <summary>
+      Filter by tag <span class="chosen" data-chosen />
+    </summary>
+
+    {
+      groups.map((group) => (
+        <section>
+          <h2>{group.heading}</h2>
+          <ul class="tag-row">
+            {group.tags.map((tag) => (
+              <li>
+                <button
+                  class:list={["tag", tag.important && "tag--important"]}
+                  type="button"
+                  data-tag={tag.slug}
+                  aria-pressed="false"
+                >
+                  {tag.label} <span class="count">{tagCount(tag)}</span>
+                </button>
+              </li>
+            ))}
+          </ul>
+        </section>
+      ))
+    }
+  </details>
+
+  <p class="state" data-state aria-live="polite"></p>
+
+  <section data-results>
+    <h2>Projects</h2>
+    {
+      projects.map((project) => (
+        <div data-hit={`project:${project.id}`} data-tags={slugs(project.data.tags)}>
+          <ProjectCard project={project} />
+        </div>
+      ))
+    }
+  </section>
+
+  <section data-results>
+    <h2>Writing</h2>
+    {
+      posts.map((post) => (
+        <div data-hit={`writing:${post.id}`} data-tags={slugs(post.data.tags)}>
+          <PostLink post={post} />
+        </div>
+      ))
+    }
+  </section>
+</BaseLayout>
+
+<script>
+  const form = document.querySelector<HTMLFormElement>("[data-form]")!;
+  const input = document.querySelector<HTMLInputElement>("#query")!;
+  const pills = [...document.querySelectorAll<HTMLButtonElement>("[data-tag]")];
+  const hits = [...document.querySelectorAll<HTMLElement>("[data-hit]")];
+  const sections = [...document.querySelectorAll<HTMLElement>("[data-results]")];
+  const state = document.querySelector<HTMLElement>("[data-state]")!;
+  const fold = document.querySelector<HTMLDetailsElement>("[data-filters]")!;
+  const chosen = document.querySelector<HTMLElement>("[data-chosen]")!;
+
+  /**
+   * Titles, descriptions and tags are in the markup, so they're searchable straight
+   * away; the body text arrives with the index and widens the same search once it does.
+   */
+  const shown = new Map(
+    hits.map((hit) => [hit, hit.innerText.replace(/\s+/g, " ").toLowerCase()]),
+  );
+  let bodies: Record<string, string> = {};
+
+  const selected = new Set<string>();
+
+  const matches = (hit: HTMLElement, query: string) => {
+    if (query && !shown.get(hit)!.includes(query)) {
+      const body = bodies[hit.dataset.hit!];
+      if (!body?.includes(query)) return false;
+    }
+
+    const tags = (hit.dataset.tags ?? "").split(" ");
+    return [...selected].every((tag) => tags.includes(tag));
+  };
+
+  const describe = (count: number, query: string) => {
+    if (!query && selected.size === 0) return "";
+    if (count === 0) return "Nothing matches.";
+    return `${count} ${count === 1 ? "result" : "results"}.`;
+  };
+
+  const remember = (query: string) => {
+    const url = new URL(location.href);
+    url.searchParams.delete("q");
+    url.searchParams.delete("tag");
+    if (query) url.searchParams.set("q", query);
+    for (const tag of selected) url.searchParams.append("tag", tag);
+    history.replaceState(null, "", url);
+  };
+
+  const run = () => {
+    const query = input.value.trim().toLowerCase();
+    let count = 0;
+
+    for (const hit of hits) {
+      const ok = matches(hit, query);
+      hit.hidden = !ok;
+      if (ok) count += 1;
+    }
+
+    for (const section of sections) {
+      section.hidden = !section.querySelector("[data-hit]:not([hidden])");
+    }
+
+    const resultLabel = `${count} ${count === 1 ? "result" : "results"}`;
+    // Folded away, the summary is the only place a selected filter can still be seen.
+    // Keep its result count there too, rather than presenting a second status line.
+    chosen.textContent = selected.size ? `· ${selected.size} on · ${resultLabel}` : "";
+    state.textContent = selected.size ? "" : describe(count, query);
+
+    remember(query);
+  };
+
+  for (const pill of pills) {
+    pill.addEventListener("click", () => {
+      const tag = pill.dataset.tag!;
+      const on = !selected.has(tag);
+      if (on) selected.add(tag);
+      else selected.delete(tag);
+      pill.setAttribute("aria-pressed", String(on));
+      run();
+    });
+  }
+
+  input.addEventListener("input", run);
+  // Nothing to submit to: results are already on the page.
+  form.addEventListener("submit", (event) => event.preventDefault());
+
+  const params = new URLSearchParams(location.search);
+  input.value = params.get("q") ?? "";
+  for (const tag of params.getAll("tag")) {
+    const pill = pills.find((candidate) => candidate.dataset.tag === tag);
+    if (!pill) continue;
+    selected.add(tag);
+    pill.setAttribute("aria-pressed", "true");
+  }
+
+  // Arriving from a tag chip, the pills are worth seeing: one of them is already on.
+  fold.open = selected.size > 0;
+
+  run();
+
+  fetch("/search.json")
+    .then((response) => response.json())
+    .then((json) => {
+      bodies = json;
+      run();
+    })
+    .catch(() => {
+      /* Titles, descriptions and tags stay searchable without it. */
+    });
+</script>
+
+<style>
+  form {
+    margin-bottom: 1.25rem;
+  }
+
+  input {
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    font: inherit;
+    color: var(--text);
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  input::placeholder {
+    color: var(--text-muted);
+  }
+
+  input:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -1px;
+  }
+
+  .filters {
+    position: relative;
+    margin: 0.4rem 0;
+    padding-left: 1.25rem;
+  }
+
+  .filters::before {
+    content: "▶";
+    position: absolute;
+    top: 0.55em;
+    left: 0;
+    color: var(--text-muted);
+    font-size: 0.75em;
+    line-height: 1;
+    transition: transform 120ms ease;
+  }
+
+  .filters summary {
+    list-style: none;
+    cursor: pointer;
+    font-weight: inherit;
+    color: var(--text);
+  }
+
+  .filters summary:hover {
+    color: var(--accent);
+  }
+
+  .filters summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .filters[open] summary {
+    margin-bottom: 0.4rem;
+  }
+
+  .filters[open]::before {
+    transform: rotate(90deg);
+  }
+
+  .chosen {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 400;
+    color: var(--text-muted);
+  }
+
+  section + section {
+    margin-top: 1.25rem;
+  }
+
+  .filters h2 {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    font-weight: 400;
+    color: var(--text-muted);
+    letter-spacing: 0;
+  }
+
+  /* The pill itself is global. Safari would paint a native button over it regardless. */
+  button.tag {
+    appearance: none;
+    cursor: pointer;
+  }
+
+  button.tag[aria-pressed="true"] {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .count {
+    font-size: 0.6875rem;
+    color: var(--text-muted);
+  }
+
+  button.tag[aria-pressed="true"] .count {
+    color: var(--accent);
+  }
+
+  .state {
+    margin: 2rem 0 0;
+    font-size: 0.8125rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .blurb {
+    margin-top: 0.4rem;
+    font-family: var(--font-sans);
+    font-size: 0.9375rem;
+  }
+
+  [data-results] h2 {
+    margin-bottom: 0.5rem;
+  }
+</style>

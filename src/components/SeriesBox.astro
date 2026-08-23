@@ -1,0 +1,66 @@
+---
+import type { Series } from "../lib/collections";
+
+interface Props {
+  series: Series;
+}
+
+const { series } = Astro.props;
+const count = `${series.parts.length} ${series.parts.length === 1 ? "part" : "parts"}`;
+---
+
+<nav class="series" aria-label={`${series.name} series`}>
+  <p class="label">{series.name} &middot; {count}</p>
+  <ol>
+    {
+      series.parts.map((part) => (
+        <li>
+          <a href={`/writing/${part.id}`}>{part.data.title}</a>
+        </li>
+      ))
+    }
+  </ol>
+</nav>
+
+<style>
+  .series {
+    margin: 0 0 2rem;
+    padding: 0.9rem 1.1rem;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+  }
+
+  .label {
+    margin: 0 0 0.6rem;
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  ol {
+    margin: 0;
+    padding-left: 1.4rem;
+    font-size: 0.9375rem;
+  }
+
+  li {
+    margin: 0.2rem 0;
+  }
+
+  a {
+    color: var(--text);
+  }
+
+  /*
+    Parts already read recede, so the box shows what's left. Only colours are allowed
+    here: browsers block anything a script could measure to read someone's history,
+    and this has to stay ahead of :hover to lose to it.
+  */
+  a:visited {
+    color: var(--text-muted);
+  }
+
+  a:hover {
+    color: var(--accent);
+  }
+</style>

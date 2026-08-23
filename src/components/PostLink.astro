@@ -2,18 +2,46 @@
 import type { CollectionEntry } from "astro:content";
 import FormattedDate from "./FormattedDate.astro";
 import TagRow from "./TagRow.astro";
+import { getSeries } from "../lib/collections";
 
 interface Props {
   post: CollectionEntry<"writing">;
   showDescription?: boolean;
+  /** Stands in for the post's own date, where a row speaks for more than one post. */
+  date?: Date;
+  /** Off where every row is the same kind of thing, so the label would only repeat. */
+  showSeries?: boolean;
 }
 
-const { post, showDescription = true } = Astro.props;
+const {
+  post,
+  showDescription = true,
+  date,
+  showSeries = true,
+} = Astro.props;
+const series = showSeries ? await getSeries(post) : undefined;
 ---
 
 <article>
-  <a class="title" href={`/writing/${post.id}`}>{post.data.title}</a>
-  <FormattedDate date={post.data.pubDate} />
+  <div class="heading">
+    <a class="title" href={`/writing/${post.id}`}>{post.data.title}</a>
+    {
+      series && (
+        <span class="series">
+          {/* The name opens the contents post, which has no need to link to itself. */}
+          {series.part > 0 ? (
+            <a href={`/writing/${series.contents.id}`}>{series.name}</a>
+          ) : (
+            series.name
+          )}
+          {series.part > 0
+            ? ` \u00b7 ${series.part} of ${series.parts.length}`
+            : " \u00b7 contents"}
+        </span>
+      )
+    }
+  </div>
+  <FormattedDate date={date ?? post.data.pubDate} />
   {showDescription && <p class="muted">{post.data.description}</p>}
   <TagRow tags={post.data.tags} />
 </article>
@@ -24,14 +52,36 @@ const { post, showDescription = true } = Astro.props;
     border-bottom: 1px solid var(--border);
   }
 
+  /* Wraps to its own line on narrow screens rather than squeezing the title. */
+  .heading {
+    display: flex;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.1rem 0.5rem;
+  }
+
   .title {
-    display: block;
     font-weight: 550;
     color: var(--text);
     text-decoration: none;
   }
 
   .title:hover {
+    color: var(--accent);
+  }
+
+  .series {
+    font-size: 0.75rem;
+    font-family: var(--font-mono);
+    color: var(--text-muted);
+  }
+
+  .series a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .series a:hover {
     color: var(--accent);
   }
 

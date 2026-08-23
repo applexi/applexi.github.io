@@ -1,16 +1,18 @@
 ---
 import BaseLayout from "../../layouts/BaseLayout.astro";
 import PostLink from "../../components/PostLink.astro";
-import { getPosts } from "../../lib/collections";
+import { getAllSeries, getListedPosts } from "../../lib/collections";
 import { site } from "../../site.config";
 
-const posts = await getPosts();
+const posts = await getListedPosts();
+// No pill while there's nothing behind it.
+const hasSeries = (await getAllSeries()).length > 0;
 ---
 
 <BaseLayout title="Writing" description={`Writing by ${site.title}.`}>
   <div class="page-heading">
     <h1>Writing</h1>
-    <a class="tag-pill" href="/tags">All tags &rarr;</a>
+    {hasSeries && <a class="tag" href="/writing/series">All series &rarr;</a>}
   </div>
 
   {

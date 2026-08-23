@@ -82,17 +82,114 @@ Write here.
 `title`, `description`, and `pubDate` are required. Set `draft: true` to keep a post
 visible in `npm run dev` but out of the published site. Posts are listed newest first.
 
-## Tags
+Folders inside `src/content/writing/` are for keeping the directory tidy and don't reach
+the site: a post in `crypto/one-time-pad.md` is still published at `/writing/one-time-pad`,
+and moving a file between folders leaves its URL alone. The same goes for
+`src/content/projects/`. Since the folder is dropped, two posts can't share a file name —
+that fails the build with both paths named rather than letting one shadow the other.
 
-Every tag in a project or post becomes a page. `tags: ["Rust", "MPC"]` puts an entry on
-both `/tags/rust` and `/tags/mpc`, each listing the projects and the writing that share
-that tag, and `/tags` lists them all with counts. Tag chips throughout the site link to
-these pages, so there's nothing to wire up — tag something and the pages appear on the
-next build.
+### Posts meant to be read in order
 
-Slugs are lowercased with punctuation turned into hyphens, so `AWS Nitro Enclaves`
-becomes `/tags/aws-nitro-enclaves`. Tags that differ only in case share a page, and the
-first spelling encountered is the one displayed — so keep spelling consistent.
+A series is a set of posts naming it, plus one that introduces it. The introduction is
+`part: 0`, and every series needs one:
+
+```markdown
+---
+title: Bootstrap placement
+description: One sentence shown in listings and search results.
+pubDate: 2026-09-01
+series: "Bootstrap placement"
+part: 0
+---
+
+Say what the series is about. The list of instalments appears under this.
+```
+
+The instalments then need nothing but the name:
+
+```markdown
+---
+title: Where the noise comes from
+description: One sentence shown in listings and search results.
+pubDate: 2026-09-08
+series: "Bootstrap placement"
+---
+```
+
+Part 0 gets a box listing the instalments and no navigation at the foot, being the page
+that holds the list rather than a step in it. Each instalment gets the parts either side of
+it and a centred link back to part 0, except that the first has no previous link: part 0
+isn't an instalment, so nothing precedes the first one. That's the reason for the split. One
+post can't be both the contents and the first instalment without its previous link and its
+contents link pointing at the same place.
+
+Instalments sort by `pubDate`, so a series written in order needs no numbering. Add `part: 2`
+when the reading order isn't the publication order — the overview written last that belongs
+third. Numbering one instalment means numbering them all, since unnumbered ones sort behind
+numbered ones. Two posts claiming one number fails the build, as does a series with no
+`part: 0`, both naming the files rather than picking a winner quietly.
+
+`/writing/series` is every `part: 0` post as an ordinary list of rows, the same shape as
+`/writing` and `/projects`, except that the date on a row is the newest date in that series
+rather than the contents post's own, and the rows sort by it — so a series you're adding to
+rises back to the top. The instalments aren't listed here; that's what the contents post is
+for. An "All series" pill sits opposite the heading on `/writing`, and disappears when there
+are no series to look at. Nothing needs maintaining here either.
+The one thing to know is that a post named `series.md` would sit at that same URL and lose,
+so the build stops and tells you to rename it.
+
+On `/writing` a series takes a single row: the newest instalment, with the series name and
+where that instalment sits written beside the title, so a long series can't crowd everything
+else off the page. The name links to part 0, for a reader who would rather start at the
+beginning, and part 0 has no row of its own — until the series has no instalments yet, when
+it takes the row itself rather than vanish. Tag pages list every post separately, since each
+carries its own tags and a reader there is after a subject rather than a reading order, and
+the feed carries them all.
+
+Instalments in that box fade to the muted grey once read, which is `:visited` and so comes
+with its rules: only colours may change, Chrome counts the visit only when the reader
+arrived by clicking a link on this site rather than from a search result, and the list
+number can't follow the title because it belongs to the item and not the link.
+
+No post ever names another, which is the point: there's one ordering to keep right
+instead of a pair of links per edge that can disagree. Adding an instalment is one new file,
+and part 0 picks it up on its own.
+
+Series and tags do different jobs, so they don't interfere — a series is a reading order,
+a tag is a subject, and a post can sit in both. Note that a drafted middle instalment is
+missing from the published chain, so readers go from part two straight to part four while
+your local copy looks complete, and a drafted part 0 fails the build for the same reason a
+missing one does.
+
+The four `series-demo-*` drafts in `src/content/writing/` show all of this in
+`npm run dev`. Delete them whenever.
+
+## Tags and search
+
+Tags have no pages of their own. `/search` is where they live: a text box, every tag as a
+pill you can switch on, and everything on the site listed below in the two sections it
+already uses. A chip on a post or project opens `/search?tag=<slug>` with that tag on, so
+tagging something needs nothing wired up.
+
+The pills sit behind a fold, so the page opens on the search box and the results rather
+than on a wall of tags. It unfolds itself when a tag arrives in the URL, since one is
+already on, and the summary counts what's selected — that being the only place a filter
+shows while folded.
+
+Filtering happens in the page, with no search library. Titles, descriptions and tags are
+matched against the markup, which is already there, and `/search.json` carries the body
+text of every entry so a word from the middle of a post finds it too. That file is built
+alongside the pages and fetched once, so the first keystroke works before it lands and
+gets deeper when it does. Selected pills combine with and, the query and the pills both
+live in the URL as `?q=` and `?tag=`, so a search can be linked, and with JavaScript off
+the page is simply a list of everything.
+
+Slugs are lowercased with punctuation turned into hyphens, so `AWS Nitro Enclaves` becomes
+`aws-nitro-enclaves`. Tags that differ only in case are one tag, and the first spelling
+encountered is the one displayed — so keep spelling consistent.
+
+A `blurb` on an important tag shows under the pills while that tag is the only one
+selected, which is the one thing tag pages used to do that the pills couldn't.
 
 ### Highlighted blocks
 
@@ -110,7 +207,7 @@ The blank lines matter for the same reason they do in folds: without them the co
 stop being parsed as Markdown. The tint comes from `--bg-highlight`, defined once per
 theme at the top of `src/styles/global.css`.
 
-To highlight bullets, the opening tag goes *inside* the bullet, right after the `-`:
+To highlight bullets, the opening tag goes _inside_ the bullet, right after the `-`:
 
 ```markdown
 - <highlight>this bullet is highlighted</highlight>
@@ -155,6 +252,10 @@ Posts and project pages render LaTeX: `$x^2$` inline, `$$...$$` on its own line.
 does the work at build time, so no JavaScript ships and the stylesheet only loads on the
 pages that have prose.
 
+The `katex` version in `package.json` only supplies the stylesheet; the renderer is the
+copy `satteri-katex` depends on. Keep the two on the same major version, or the class
+names stop matching and every superscript, subscript, and accent renders at full size.
+
 One macro is defined in `astro.config.mjs`: `\sample` gives the uniform-sampling arrow
 (`\overset{$}{\leftarrow}`). It exists because a literal `\$` inside math ends the
 expression early, so anything needing a dollar sign in math wants a macro instead.
@@ -171,7 +272,7 @@ change the name in that config. Any VS Code theme works as long as it's a standa
 TextMate theme, meaning it has its own `tokenColors` rather than an `include` pointing at
 another file.
 
-The block's *background* isn't taken from the theme — it stays on `--bg-subtle` so it
+The block's _background_ isn't taken from the theme — it stays on `--bg-subtle` so it
 matches inline code and table headers. Only the token colors come from the theme. Dropping
 the `.astro-code` background rule in `global.css` would let each theme's own backdrop
 through instead.
@@ -185,11 +286,11 @@ with them in `src/themes/LICENSE-grayjack-themes.txt`.
 
 ### Important tags
 
-Some tags say what a thing *is* rather than what it's about — Poetry, Creative Writing,
+Some tags say what a thing _is_ rather than what it's about — Poetry, Creative Writing,
 Technical Note. Those are listed in `importantTags` in `src/site.config.ts`, and they're
 ordinary tags with three differences: they sort ahead of other tags wherever tags are
-shown, they get their own group at the top of `/tags`, and their tag page opens with the
-`blurb` from the config.
+shown, they get their own group of pills at the top of `/search`, and their `blurb` from
+the config appears there while one of them is the only tag selected.
 
 Each one also carries a `short` name, a lowercase form for when a tag needs to read as
 part of a sentence rather than as a label.

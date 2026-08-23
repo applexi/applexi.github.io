@@ -38,32 +38,17 @@ export const intro = [
 /**
  * Tags that say what kind of thing something is, rather than what it's about.
  * They behave like any other tag — write them in a post's `tags` list — but they sort
- * ahead of the rest wherever tags are shown, and get their own section on /tags.
+ * ahead of the rest wherever tags are shown, and get their own group of pills on /search.
  *
- * `label` must match how the tag is written in frontmatter. `short` is a shorter name for
- * the tag, used where it reads better in prose, and `blurb` introduces the tag's own page.
+ * `label` must match how the tag is written in frontmatter, and `short` is a shorter name
+ * for the tag, used where it reads better in prose.
  */
 export const importantTags = [
-  {
-    label: "Technical Project",
-    short: "technical projects",
-    blurb: "Things I've built, mostly cryptography and the systems around it.",
-  },
-  {
-    label: "Poetry",
-    short: "poems",
-    blurb: "Poems.",
-  },
-  {
-    label: "Creative Writing",
-    short: "prose",
-    blurb: "Prose, essays, and everything that isn't a poem or a technical note.",
-  },
-  {
-    label: "Technical Note",
-    short: "technical notes",
-    blurb: "Blurbs on technical things I find or found interesting.",
-  },
+  { label: "Technical Project", short: "technical projects" },
+  { label: "Personal Project", short: "personal projects" },
+  { label: "Poetry", short: "poems" },
+  { label: "Creative Writing", short: "prose" },
+  { label: "Technical Note", short: "technical notes" },
 ] as const;
 
 /**
@@ -86,6 +71,7 @@ export const resumePdf = "/resume.pdf";
 /** Top navigation. Remove an entry to hide that section from the nav. */
 export const nav = [
   { label: "Home", href: "/" },
+  { label: "Search", href: "/search" },
   { label: "Projects", href: "/projects" },
   { label: "Writing", href: "/writing" },
   ...(resumePdf ? [{ label: "Resume", href: resumePdf }] : []),
