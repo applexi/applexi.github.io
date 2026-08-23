@@ -1,6 +1,6 @@
 ---
 import BaseLayout from "../layouts/BaseLayout.astro";
-import { intro, site, socials } from "../site.config";
+import { intro, site } from "../site.config";
 ---
 
 <BaseLayout>
@@ -14,9 +14,6 @@ import { intro, site, socials } from "../site.config";
 
   {intro.map((paragraph) => <p>{paragraph}</p>)}
 
-  <p class="socials">
-    {socials.map((link) => <a href={link.href} rel="me noopener">{link.label}</a>)}
-  </p>
 </BaseLayout>
 
 <style>
@@ -41,11 +38,4 @@ import { intro, site, socials } from "../site.config";
     object-fit: cover;
   }
 
-  .socials {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 1.25rem;
-    margin-top: 2rem;
-    font-size: 0.9375rem;
-  }
 </style>
