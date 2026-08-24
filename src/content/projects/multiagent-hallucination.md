@@ -4,7 +4,7 @@ description: A multi-agent pipeline that grounds its reviewer agent in a local m
 github: https://github.com/applexi/MultiAgent-Hallucination
 paper: /marage.pdf
 tags: ["Technical Project", "Python", "Machine Learning", "LLMs", "RAG"]
-order: 4
+order: 2
 draft: false
 ---
 

@@ -47,7 +47,7 @@ const projects = defineCollection({
     // A write-up: either a full URL or a file in public/, e.g. "/marage.pdf".
     paper: z.string().optional(),
     tags: z.array(z.string()).default([]),
-    // Lower numbers sort first. Ties fall back to alphabetical order.
+    // Higher numbers sort first. Ties fall back to alphabetical order.
     order: z.number().default(99),
     draft: z.boolean().default(false),
   }),
