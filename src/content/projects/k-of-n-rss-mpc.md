@@ -3,7 +3,7 @@ title: k-of-n Replicated Secret Sharing
 description: A configurable k-of-n replicated secret-sharing MPC framework in Rust, with PRNG-optimized multiplication and MSB extraction.
 github: https://github.com/applexi/k-of-n-rss-mpc
 tags: ["Technical Project", "Rust", "MPC", "Secret Sharing", "Cryptography"]
-order: 4
+order: 5
 draft: false
 ---
 

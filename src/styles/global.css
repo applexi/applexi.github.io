@@ -386,6 +386,16 @@ blockquote {
 }
 
 /*
+  A standalone highlight that is only a list should line up with ordinary .prose lists.
+  Horizontal padding would stack on top of the list's own padding-left and push text
+  one indent too far; keep the tint, drop the extra horizontal inset.
+*/
+.prose > :is(.highlight, highlight):has(> :is(ul, ol)) {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+/*
   Highlighting a bullet: the tint reaches left by the list's own 1.25rem of padding,
   which is where the marker is drawn, and the matching left padding keeps the text
   where it was. The marker is inline content of the item, so it paints over the tint
@@ -400,13 +410,16 @@ li :is(.highlight, highlight) {
   A toggle can be written as a nested list item to inherit the list's indentation.
   Its text stays in the list item's content column, while a triangle is centered in
   the same marker gutter as an ordinary bullet.
+
+  Markdown often wraps an unfinished <details> opener in <p> when the list item also
+  contains a nested list, so details may not be a direct child of li. Match either shape.
 */
-.prose li:has(> details) {
+.prose li:has(details) {
   position: relative;
   list-style: none;
 }
 
-.prose li:has(> details)::before {
+.prose li:has(details)::before {
   content: "▶";
   position: absolute;
   top: 0.55em;
@@ -485,7 +498,7 @@ li :is(.highlight, highlight) {
   display: none;
 }
 
-.prose li:has(> details[open])::before {
+.prose li:has(details[open])::before {
   transform: rotate(90deg);
 }
 
@@ -494,6 +507,15 @@ li :is(.highlight, highlight) {
 }
 
 .prose details > :not(summary) {
+  margin-left: 1.25rem;
+}
+
+/*
+  When markdown leaves the toggle's list as a sibling of <details> (or of the <p>
+  that wrapped it), indent that list the same way as details > :not(summary).
+*/
+.prose li:has(details) > ul,
+.prose li:has(details) > ol {
   margin-left: 1.25rem;
 }
 

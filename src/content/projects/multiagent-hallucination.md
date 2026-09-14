@@ -4,7 +4,7 @@ description: A multi-agent pipeline that grounds its reviewer agent in a local m
 github: https://github.com/applexi/MultiAgent-Hallucination
 paper: /marage.pdf
 tags: ["Technical Project", "Python", "Machine Learning", "LLMs", "RAG"]
-order: 2
+order: 3
 draft: false
 ---
 
@@ -27,12 +27,18 @@ corpus, and the reviewer rewrites the response constrained to what came back. If
 
 We evaluated on 500 prompts generated to induce hallucination, half medical, using an
 LLM-judged score for factuality and helpfulness plus a hand-labeled subset for ground
-truth. Retrieval improved the Agent 1 to Agent 2 correction step from 10.85% to 13.11%,
-and on the hand-labeled set it cut the hallucination rate from 46% to 34% and raised
-factuality from 0.54 to 0.66 without costing helpfulness. The gains concentrate exactly
-where the change was made, which is the result we wanted. Routing accuracy turned out to
-matter as much as retrieval quality: prompts sent down the wrong path did measurably
+truth. The gains concentrate at Agent 2 where we changed the pipeline. Routing
+accuracy mattered as much as retrieval: prompts sent down the wrong path did measurably
 worse than if they'd been left alone.
+
+| Metric | Baseline | MedRAG |
+| --- | ---: | ---: |
+| Agent 1→2 correction (overall) | 10.85% | 13.11% |
+| Agent 1→2 correction (medical) | 10.19% | 12.59% |
+| Agent 1→2 correction (general) | 11.56% | 13.64% |
+| Hallucination rate (hand-labeled) | 46% | 34% |
+| Avg factuality (0–1) | 0.54 | 0.66 |
+| Avg helpfulness (0–5) | 3.08 | 3.20 |
 
 Two things went differently than planned. The pipeline we meant to build on was unoptimized (little to no parallelization) and its headline metric had no working implementation (the cited repository in the paper did not follow the published metric), so we reimplemented it from scratch with checkpointing, parallel execution, and replaced the metric with a rubric we could defend. We also intended to retrieve by crawling
 authoritative medical sources live, the way [Tran et al.'s verification
@@ -43,7 +49,7 @@ Everything ran on a CPU-only Mac through Ollama with a 3B-parameter model, about
 hours end to end. That constraint is also the main limitation: a small evaluator model
 makes the automatic metric noisy, which is why we also included hand-labeled results.
 
-Built with Stephanie Yang and Jiacheng Wang for CMU's Fall 2025 Generative AI course
+Built with Stephanie Yang and Jiacheng Wang for CMU's Spring 2026 Generative AI course
 (10-423/623).
 
 <!--

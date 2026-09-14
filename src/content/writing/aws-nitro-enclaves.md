@@ -276,29 +276,29 @@ index = 0..31
 digest = "SHA384"
 ```
 
-<toggle>
-<title> More on the optional fields: </title>
 
-- Note: Technically as long as the sizes are within the range, the enclave can put
-  "anything" into these optional fields. The following are guidelines from AWS.
-- **Nonce:** Service gives enclave a nonce, which the enclave puts in the attestation
-  - Guarantees service is talking to a live enclave and not some adversary reusing an
-    older attestation document
-  - Services should treat this nonce as a one-time token
-- **Public Key:** After generating a (public key, private key), enclave gives service
-  public key
-  - For sending secret data back to the enclave that only enclave can decrypt, or for
-    the service to validate signatures made by the enclave
-  - API calls that do not have mutating effects on the service side might consider not
-    using a nonce and just encrypting responses to such a public key, since only the
-    correct enclave could decrypt the responses. Note that this mechanism would not
-    provide by itself protection against replay attacks.
-- **User data:** Any data enclave can include in the attestation
-  - Could carry API parameters, or signature of them, or could be used by enclave to
-  sign off on an operation it completed (essentially used for additional trust)
-  </toggle>
+- <toggle> <title> More on the optional fields: </title>
+  - Note: Technically as long as the sizes are within the range, the enclave can put
+    "anything" into these optional fields. The following are guidelines from AWS.
+  - **Nonce:** Service gives enclave a nonce, which the enclave puts in the attestation
+    - Guarantees service is talking to a live enclave and not some adversary reusing an
+      older attestation document
+    - Services should treat this nonce as a one-time token
+  - **Public Key:** After generating a (public key, private key), enclave gives service
+    public key
+    - For sending secret data back to the enclave that only enclave can decrypt, or for
+      the service to validate signatures made by the enclave
+    - API calls that do not have mutating effects on the service side might consider not
+      using a nonce and just encrypting responses to such a public key, since only the
+      correct enclave could decrypt the responses. Note that this mechanism would not
+      provide by itself protection against replay attacks.
+  - **User data:** Any data enclave can include in the attestation
+    - Could carry API parameters, or signature of them, or could be used by enclave to
+      sign off on an operation it completed (essentially used for additional trust) </toggle>
 
-- <highlight> Note that the `pcrs` map in the attestation are **locked PCRs** rather than all PCRs.
+<highlight>
+
+- Note that the `pcrs` map in the attestation are **locked PCRs** rather than all PCRs.
   Additionally, besides the six PCRs described earlier, there are 32 total indices.
   - PCRs can only be described (get lock status), locked, or extended. Thus, all locked
     PCRs stay locked and cannot be re-locked or changed during the enclave's lifetime
@@ -312,10 +312,11 @@ digest = "SHA384"
     - These can be used as additional measurements describing run-time states
   - Just because PCRs are locked and thus exposed in the attestation does not mean KMS or
     any other verifier must "use" them for validation
-- For more information on how the PCRs are specifically calculated, and what exactly the
-  EIF is, take a look at the [enclave image format crate](https://github.com/aws/aws-nitro-enclaves-image-format).
 
 </highlight>
+
+- For more information on how the PCRs are specifically calculated, and what exactly the
+  EIF is, take a look at the [enclave image format crate](https://github.com/aws/aws-nitro-enclaves-image-format).
 
 ### Attestation Document Validation
 

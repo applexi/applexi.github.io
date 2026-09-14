@@ -1,0 +1,16 @@
+# GitHub still runs a legacy Jekyll "pages build and deployment" check on push.
+# The live site is published by .github/workflows/deploy.yml (Astro → Actions).
+# Exclude Astro sources so Jekyll does not fail parsing .astro front matter.
+exclude:
+  - src
+  - node_modules
+  - dist
+  - public
+  - .github
+  - .vscode
+  - .astro
+  - package.json
+  - package-lock.json
+  - astro.config.mjs
+  - tsconfig.json
+  - README.md

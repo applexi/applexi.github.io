@@ -4,7 +4,7 @@ description: A service on AWS Nitro Enclaves that generates, attests, and verifi
 github: https://github.com/applexi/random-enclave
 tags:
   ["Technical Project", "Rust", "AWS", "TEE", "Cryptography", "Systems", "Security"]
-order: 5
+order: 6
 draft: false
 ---
 
