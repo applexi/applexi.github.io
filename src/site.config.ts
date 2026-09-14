@@ -74,5 +74,5 @@ export const nav = [
   { label: "Search", href: "/search" },
   { label: "Projects", href: "/projects" },
   { label: "Writing", href: "/writing" },
-  // ...(resumePdf ? [{ label: "Resume", href: resumePdf }] : []),
+  ...(resumePdf ? [{ label: "Resume", href: resumePdf }] : []),
 ];
